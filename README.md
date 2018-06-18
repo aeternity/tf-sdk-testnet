@@ -44,7 +44,7 @@ terraform apply
 mkdir -p ~/.kube
 terraform output config_map_aws_auth > aws-auth.yaml
 terraform output kubeconfig > ~/.kube/config
-kubectl create configmap epoch-keys --from-file=keys
+kubectl create secret generic epoch-keys --from-file=keys
 kubectl create configmap epoch-config --from-file=conf
 kubectl apply -f aws-auth.yaml
 kubectl apply -f kubernetes/aws-auth.yaml
