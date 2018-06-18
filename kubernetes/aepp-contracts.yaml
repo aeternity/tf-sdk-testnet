@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aepp-contracts
+  labels:
+    app: aepp-contracts
+spec:
+  containers:
+  - name: aepp-contracts
+    image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-contracts:latest
+    ports:
+    - name: web
+      containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aepp-contracts-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: web
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: aepp-contracts
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: aepp-contracts
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app: aepp-contracts
+  endpoints:
+  - port: web
