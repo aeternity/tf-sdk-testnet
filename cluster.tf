@@ -78,9 +78,9 @@ resource "aws_launch_configuration" "sdk_testnet" {
 }
 
 resource "aws_autoscaling_group" "sdk_testnet" {
-  desired_capacity     = 2
+  desired_capacity     = 5
   launch_configuration = "${aws_launch_configuration.sdk_testnet.id}"
-  max_size             = 2
+  max_size             = 5
   min_size             = 1
   name                 = "sdk-testnet"
   vpc_zone_identifier  = ["${aws_subnet.sdk_testnet.*.id}"]
