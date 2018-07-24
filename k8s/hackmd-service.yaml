@@ -1,0 +1,92 @@
+--- 
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: caddy-proxy
+  namespace: hackmd
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        app: caddy-proxy
+    spec:
+      containers:
+        - name: caddy-proxy
+          image: 'registry.hub.docker.com/abiosoft/caddy'
+          imagePullPolicy: Always
+          env:
+            - name: ACME_AGREE
+              value: "true"
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 443
+            - containerPort: 80
+          volumeMounts:
+            - name: caddy-proxy-config
+              mountPath: /etc/Caddyfile
+              subPath: Caddyfile
+      volumes:
+        - name: caddy-proxy-config
+          configMap:
+            name: caddy-proxy-config
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: caddy-proxy-config
+  namespace: hackmd
+data:
+  Caddyfile: |-
+    hackmd.aepps.com {
+      cors {
+        allow_credentials true
+        allowed_headers   Content-Type
+      }
+
+      proxy / hackmd:3000 {
+        transparent
+      }
+    }
+
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta1
+metadata:
+  name: caddy-proxy-hpa
+  namespace: hackmd
+spec:
+  minReplicas: 1
+  maxReplicas: 1
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: caddy-proxy
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caddy-proxy-lb
+  namespace: hackmd
+spec:
+  type: LoadBalancer
+  ports:
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: caddy-proxy
