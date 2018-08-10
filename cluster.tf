@@ -78,7 +78,7 @@ resource "aws_launch_configuration" "sdk_testnet" {
 }
 
 resource "aws_autoscaling_group" "sdk_testnet" {
-  desired_capacity     = 5
+  desired_capacity     = 2
   launch_configuration = "${aws_launch_configuration.sdk_testnet.id}"
   max_size             = 5
   min_size             = 1
