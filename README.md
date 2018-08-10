@@ -47,12 +47,20 @@ terraform output kubeconfig > ~/.kube/config
 kubectl create secret generic epoch-keys --from-file=keys
 kubectl create configmap epoch-config --from-file=conf
 kubectl apply -f aws-auth.yaml
-kubectl apply -f kubernetes/aws-auth.yaml
-kubectl apply -f kubernetes/master.yaml
-kubectl apply -f kubernetes/miner.yaml
-kubectl apply -f kubernetes/aepp-contracts.yaml
+kubectl apply -f k8s/aws-auth.yaml
+kubectl apply -f k8s/gp2-storage-class.yaml
+kubectl apply -f k8s/sdk-testnet.yaml
+kubectl apply -f k8s/aepp-contracts.yaml
+kubectl apply -f k8s/aepp-faucet.yaml
+kubectl apply -f k8s/http-proxy.yaml
 # etc
 ```
+
+4. Changes in terraform configuration
+
+To be able to apply the changes on the infrastructure 
+deployed with terraform you need to have access to the 
+terraform state file (`terraform.tfstate`). 
 
 License
 -------
