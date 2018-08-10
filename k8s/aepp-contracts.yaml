@@ -26,7 +26,6 @@ kind: Service
 metadata:
   name: aepp-contracts-service
 spec:
-  type: LoadBalancer
   ports:
   - name: web
     port: 80
@@ -34,6 +33,25 @@ spec:
     protocol: TCP
   selector:
     app: aepp-contracts
+    
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta1
+metadata:
+  name: aepp-contracts-hpa
+spec:
+  minReplicas: 1
+  maxReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: aepp-contracts
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 100
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
