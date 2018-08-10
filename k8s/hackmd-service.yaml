@@ -51,6 +51,8 @@ data:
         allow_credentials true
         allowed_headers   Content-Type
       }
+      # tls off
+      tls aepp-dev@aeternity.com
 
       proxy / hackmd:3000 {
         transparent
