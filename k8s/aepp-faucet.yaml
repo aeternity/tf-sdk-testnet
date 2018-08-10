@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aepp-faucet-secrets
+type: Opaque
+data:
+  # TODO: set here the bnk key before deploy (base64 encoded)
+  BANK_WALLET_KEY: xyz
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: aepp-faucet-config
+data:
+  EPOCH_URL: https://sdk-testnet.aepps.com
+  TOPUP_AMOUNT: '250' 
+  TX_TTL: '50'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aepp-faucet
+spec:
+  selector:
+    matchLabels:
+      app: aepp-faucet
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aepp-faucet
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: aepp-faucet
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-faucet:latest
+        ports:
+        - name: web
+          containerPort: 5000
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
+          limits:
+            cpu: "600m"
+            memory: "256Mi"
+        env:
+        - name: EPOCH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: aepp-faucet-config
+              key: EPOCH_URL
+        - name: TX_TTL
+          valueFrom:
+            configMapKeyRef:
+              name: aepp-faucet-config
+              key: TX_TTL
+        - name: TOPUP_AMOUNT
+          valueFrom:
+            configMapKeyRef:
+              name: aepp-faucet-config
+              key: TOPUP_AMOUNT
+        - name: BANK_WALLET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aepp-faucet-secrets
+              key: BANK_WALLET_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aepp-faucet-service
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: aepp-faucet
+
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta1
+metadata:
+  name: aepp-faucet-hpa
+spec:
+  minReplicas: 1
+  maxReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: aepp-faucet
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 100
+
