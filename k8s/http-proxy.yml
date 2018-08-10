@@ -1,0 +1,152 @@
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: http-proxy-data
+spec:
+  resources:
+    requests:
+      storage: 10Mi
+  accessModes:
+    - ReadWriteOnce
+
+--- 
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: http-proxy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        app: http-proxy
+    spec:
+      containers:
+        - name: http-proxy
+          image: 'registry.hub.docker.com/abiosoft/caddy'
+          imagePullPolicy: Always
+          env:
+            - name: ACME_AGREE
+              value: "true"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "64Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 443
+            - containerPort: 80
+          volumeMounts:
+            - name: http-proxy-config
+              mountPath: /etc/Caddyfile
+              subPath: Caddyfile
+            - name: http-proxy-data
+              mountPath: /root/.caddy
+      volumes:
+        - name: http-proxy-config
+          configMap:
+            name: http-proxy-config
+        - name: http-proxy-data
+          persistentVolumeClaim:
+            claimName: http-proxy-data
+
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: http-proxy-config
+data:
+  Caddyfile: |-
+
+    # sdk-testnet.aepps.com {
+    #   errors stdout
+    #   log stdout
+    #   cors {
+    #     allow_credentials true
+    #     allowed_headers   Content-Type
+    #   }
+    #   tls aepp-dev@aeternity.com
+
+    #   rewrite {
+    #     regexp ^(.*)//(.*)$
+    #     to {1}/{2}
+    #   }
+
+    #   proxy /internal epoch-master:3113 {
+    #     transparent
+    #     without /internal
+    #   }
+
+    #   proxy / epoch-master:3013 {
+    #     transparent
+    #   }
+    # }
+   
+    faucet.aepps.com {
+      tls off
+      # tls aepp-dev@aeternity.com
+      errors stdout
+      log stdout
+      proxy / aepp-faucet-service:80 {
+        transparent 
+      }
+    }
+
+    contracts.aepps.com {
+      tls off
+      # tls aepp-dev@aeternity.com
+      errors stdout
+      log stdout
+      proxy / aepp-contracts-service:80 {
+        transparent 
+      }
+    }
+
+    :443 {
+      tls off
+      status 200 /
+    }
+
+    :80 {
+      status 200 /
+    }
+
+
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta1
+metadata:
+  name: http-proxy-hpa
+spec:
+  minReplicas: 1
+  maxReplicas: 1
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: http-proxy
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-proxy-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: http-proxy
