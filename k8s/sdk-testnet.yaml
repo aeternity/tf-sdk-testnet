@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: epoch-master
-        image: aeternity/epoch:v0.18.0
+        image: aeternity/epoch:v0.20.0
         ports:
         - containerPort: 3013
         - containerPort: 3015
@@ -95,7 +95,7 @@ spec:
     spec:
       containers:
       - name: node
-        image: aeternity/epoch:v0.18.0
+        image: aeternity/epoch:v0.20.0
         ports:
         - containerPort: 3015
         volumeMounts:
@@ -140,7 +140,7 @@ data:
     mining:
       beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
       autostart: true
-      expected_mine_rate: 15000
+      expected_mine_rate: 1200000
       cuckoo:
         miner:
           executable: mean16s-generic
