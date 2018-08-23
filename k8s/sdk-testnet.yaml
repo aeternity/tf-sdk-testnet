@@ -1,4 +1,86 @@
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: epoch-config
+data:
+  epoch-master.yaml: |
+    ---
+    peers: []
+
+    http:
+      external:
+        port: 3013
+      internal:
+        listen_address: 0.0.0.0
+      debug: true
+
+    websocket:
+      internal:
+        listen_address: 0.0.0.0
+
+    keys:
+      password: "top secret"
+      dir: ./keys
+
+    chain:
+      persist: true
+
+    mining:
+      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      autostart: true
+      expected_mine_rate: 1200000
+      cuckoo:
+        miner:
+          executable: mean16s-generic
+          extra_args: ""
+          node_bits: 16
+  epoch-miner.yaml: |
+    ---
+    peers:
+    - aenode://pp$HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@epoch-master:3015
+
+    http:
+      external:
+        port: 3013
+      internal:
+        listen_address: 0.0.0.0
+
+    websocket:
+      internal:
+        listen_address: 0.0.0.0
+
+    keys:
+      password: "top secret"
+      dir: ./keys
+
+    chain:
+      persist: true
+
+    mining:
+      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      autostart: true
+      expected_mine_rate: 15000
+      cuckoo:
+        miner:
+          executable: mean16s-generic
+          extra_args: ""
+          node_bits: 16
+
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: epoch-keys
+data:
+  peer_key: nygu7kcLnVFSm7c7bCxt5ZZoHTW+IDxc+4ZXphUTNZ0=
+  peer_key.pub: 447iAeRHfkA+78ZujyZeRvhyxuYXuI2EFbP0VvVKvPg=
+  sign_key: XyspyCDOEDeCBdaqwOGhq7ofLvsQCdQM48ELGMP/200Do9dSK+EWz76VUca+kma7A1G1kQ0ZKayI90yv5NeW6w==
+  sign_key.pub: A6PXUivhFs++lVHGvpJmuwNRtZENGSmsiPdMr+TXlus=
+
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -109,84 +191,5 @@ spec:
         configMap:
           name: epoch-config
 
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: epoch-config
-data:
-  epoch-master.yaml: |
-    ---
-    peers: []
 
-    http:
-      external:
-        port: 3013
-      internal:
-        listen_address: 0.0.0.0
-      debug: true
-
-    websocket:
-      internal:
-        listen_address: 0.0.0.0
-
-    keys:
-      password: "top secret"
-      dir: ./keys
-
-    chain:
-      persist: true
-
-    mining:
-      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
-      autostart: true
-      expected_mine_rate: 1200000
-      cuckoo:
-        miner:
-          executable: mean16s-generic
-          extra_args: ""
-          node_bits: 16
-  epoch-miner.yaml: |
-    ---
-    peers:
-    - aenode://pp$HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@epoch-master:3015
-
-    http:
-      external:
-        port: 3013
-      internal:
-        listen_address: 0.0.0.0
-
-    websocket:
-      internal:
-        listen_address: 0.0.0.0
-
-    keys:
-      password: "top secret"
-      dir: ./keys
-
-    chain:
-      persist: true
-
-    mining:
-      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
-      autostart: true
-      expected_mine_rate: 15000
-      cuckoo:
-        miner:
-          executable: mean16s-generic
-          extra_args: ""
-          node_bits: 16
-
----
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-  name: epoch-keys
-data:
-  peer_key: nygu7kcLnVFSm7c7bCxt5ZZoHTW+IDxc+4ZXphUTNZ0=
-  peer_key.pub: 447iAeRHfkA+78ZujyZeRvhyxuYXuI2EFbP0VvVKvPg=
-  sign_key: XyspyCDOEDeCBdaqwOGhq7ofLvsQCdQM48ELGMP/200Do9dSK+EWz76VUca+kma7A1G1kQ0ZKayI90yv5NeW6w==
-  sign_key.pub: A6PXUivhFs++lVHGvpJmuwNRtZENGSmsiPdMr+TXlus=
 
