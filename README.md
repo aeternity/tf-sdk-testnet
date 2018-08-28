@@ -69,6 +69,15 @@ terraform state file (`terraform.tfstate`).
 - create kubectl configuration 
 - [add the new user to the k8s system](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html)
 
+Deploy new applications
+-----------------------
+
+To deploy a new application:
+- write the k8s configuration of the application
+- add a `ClusterIP` service that exposes the application ports to the cluster
+- add a ingress configuration to bind the dns name to the service.
+
+
 License
 -------
 
