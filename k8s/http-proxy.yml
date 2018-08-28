@@ -65,13 +65,13 @@ data:
   Caddyfile: |-
 
     # sdk-testnet.aepps.com {
+    #   tls aepp-dev@aeternity.com  
     #   errors stdout
     #   log stdout
     #   cors {
     #     allow_credentials true
     #     allowed_headers   Content-Type
     #   }
-    #   tls aepp-dev@aeternity.com
 
     #   rewrite {
     #     regexp ^(.*)//(.*)$
@@ -89,8 +89,8 @@ data:
     # }
    
     faucet.aepps.com {
-      tls off
-      # tls aepp-dev@aeternity.com
+      # tls off
+      tls aepp-dev@aeternity.com
       errors stdout
       log stdout
       proxy / aepp-faucet-service:80 {
@@ -99,8 +99,8 @@ data:
     }
 
     contracts.aepps.com {
-      tls off
-      # tls aepp-dev@aeternity.com
+      # tls off
+      tls aepp-dev@aeternity.com
       errors stdout
       log stdout
       proxy / aepp-contracts-service:80 {
@@ -108,14 +108,35 @@ data:
       }
     }
 
-    :443 {
-      tls off
+    hackmd.aepps.com {
+      # tls off
+      tls aepp-dev@aeternity.com
+      errors stdout
+      log stdout
+
+      cors {
+        allow_credentials true
+        allowed_headers   Content-Type
+      }
+
+      # hackmd service is in the "hackmd" namespace
+      proxy / hackmd.hackmd.svc.cluster.local:3000 {
+        transparent
+      }
+    }
+
+    # this is to provide a rensponsive interface 
+    # to the aws elb healtcheck service
+    fallback:443 {
+      tls self_signed
       status 200 /
     }
 
-    :80 {
+    fallback:80 {
       status 200 /
     }
+
+
 
 
 ---
