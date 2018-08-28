@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-acme
+  namespace: traefik
+spec:
+  resources:
+    requests:
+      storage: 10Mi
+  accessModes:
+    - ReadWriteOnce
+
+# deployment
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik
+  namespace: traefik
+  labels:
+    app: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+        name: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: traefik
+        image: traefik
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        - name: admin
+          containerPort: 8080
+        args:
+        - --api
+        - --configfile=/config/traefik.toml
+        volumeMounts:
+        - name: traefik-config
+          mountPath: /config
+          readOnly: true
+        - name: traefik-acme
+          mountPath: /acme
+      volumes:
+        - name: traefik-config
+          configMap:
+            name: traefik-config
+        - name: traefik-acme
+          persistentVolumeClaim:
+            claimName: traefik-acme
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-lb
+  namespace: traefik
+spec:
+  selector:
+    app: traefik
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+    - protocol: TCP
+      port: 443
+      name: https
+  

@@ -1,0 +1,46 @@
+---
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  namespace: traefik
+apiVersion: v1
+data:
+  traefik.toml: |-
+    debug = false
+    defaultEntryPoints = ["http", "https"]
+    logLevel = "ERROR"
+
+    [entryPoints]
+    
+    [entryPoints.http]
+    address = ":80"
+    compress = true
+    
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+    
+    [entryPoints.https]
+    address = ":443"
+    compress = true
+    
+    [entryPoints.https.tls]
+
+    [retry]
+
+    [kubernetes]
+
+    [acme]
+    acmeLogging = true
+    email = "aepp-dev@aeternity.com"
+    storage = "/acme/acme.json"
+    onHostRule = true
+    entryPoint = "https"
+    
+    [acme.httpChallenge]
+    entryPoint = "http"
+
+    # this is for the dashboard
+    [web]
+    address = ":8080"
+    [web.auth.basic]
+    users = ["traefik:$2y$05$M6GZaiWFv5wassGSjeRdMukNpNWBfmaS9P/8lgEHB6oun3uGdwniq"]

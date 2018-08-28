@@ -1,0 +1,23 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: aepps-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: faucet.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: aepp-faucet-service
+          servicePort: 80
+  - host: contracts.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: aepp-contracts-service
+          servicePort: 80
