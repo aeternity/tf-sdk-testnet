@@ -12,7 +12,7 @@ required.
 [Kubernetes]: https://kubernetes.io/
 [upstream template]: https://github.com/terraform-providers/terraform-provider-aws/tree/master/examples/eks-getting-started
 [AWS EKS]: https://aws.amazon.com/eks/
-[Heptio Authenticator for AWS]: https://github.com/heptio/authenticator
+[Authenticator for AWS]: https://github.com/kubernetes-sigs/aws-iam-authenticator
 
 Usage
 -----
@@ -25,9 +25,7 @@ It is assumed that Terraform has already been
 
 1. Install Heptio Autenticator
 
-```sh
-go get -u -v github.com/heptio/authenticator/cmd/heptio-authenticator-aws
-```
+https://docs.aws.amazon.com/eks/latest/userguide/configure-kubectl.html
 
 2. Deploy EKS
 
@@ -49,9 +47,11 @@ kubectl create configmap epoch-config --from-file=conf
 kubectl apply -f aws-auth.yaml
 kubectl apply -f k8s/gp2-storage-class.yaml
 kubectl apply -f k8s/sdk-testnet.yaml
+kubectl apply -f k8s/sdk-edgenet.yaml
 kubectl apply -f k8s/aepp-contracts.yaml
 kubectl apply -f k8s/aepp-faucet.yaml
-kubectl apply -f k8s/http-proxy.yaml
+kubectl apply -f k8s/traefik
+kubectl apply -f k8s/ingress
 # etc
 ```
 
@@ -60,6 +60,14 @@ kubectl apply -f k8s/http-proxy.yaml
 To be able to apply the changes on the infrastructure 
 deployed with terraform you need to have access to the 
 terraform state file (`terraform.tfstate`). 
+
+
+### Add a new user 
+- create a new user on aws IAM
+- [install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [install aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/configure-kubectl.html)
+- create kubectl configuration 
+- [add the new user to the k8s system](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html)
 
 License
 -------
