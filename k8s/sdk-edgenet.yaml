@@ -1,0 +1,112 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-epoch-config
+data:
+  epoch-master.yaml: |
+    ---
+    peers: []
+
+    http:
+      external:
+        port: 3013
+      internal:
+        listen_address: 0.0.0.0
+      debug: false
+
+    websocket:
+      internal:
+        listen_address: 0.0.0.0
+
+    keys:
+      password: "top secret"
+      dir: ./keys
+
+    chain:
+      persist: true
+
+    mining:
+      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      autostart: true
+      expected_mine_rate: 1200000
+      cuckoo:
+        miner:
+          executable: mean16s-generic
+          extra_args: ""
+          node_bits: 16
+
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: edge-epoch-keys
+data:
+  peer_key: nygu7kcLnVFSm7c7bCxt5ZZoHTW+IDxc+4ZXphUTNZ0=
+  peer_key.pub: 447iAeRHfkA+78ZujyZeRvhyxuYXuI2EFbP0VvVKvPg=
+  sign_key: XyspyCDOEDeCBdaqwOGhq7ofLvsQCdQM48ELGMP/200Do9dSK+EWz76VUca+kma7A1G1kQ0ZKayI90yv5NeW6w==
+  sign_key.pub: A6PXUivhFs++lVHGvpJmuwNRtZENGSmsiPdMr+TXlus=
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-epoch-master
+spec:
+  selector:
+    matchLabels:
+      app: edge-epoch-master
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: edge-epoch-master
+    spec:
+      containers:
+      - name: edge-epoch-master
+        image: aeternity/epoch:v0.20.0
+        ports:
+        - containerPort: 3013
+        - containerPort: 3015
+        - containerPort: 3113
+        volumeMounts:
+        - name: config
+          mountPath: /etc/epoch
+        - name: keys
+          mountPath: /home/epoch/node/keys
+          readOnly: true
+        env:
+        - name: EPOCH_CONFIG
+          value: /etc/epoch/epoch-master.yaml
+      volumes:
+      - name: config
+        configMap:
+          name: edge-epoch-config
+      - name: keys
+        secret:
+          secretName: edge-epoch-keys
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-epoch-master
+spec:
+  ports:
+  - name: external
+    port: 3013
+    targetPort: 3013
+    protocol: TCP
+  - name: sync
+    port: 3015
+    targetPort: 3015
+    protocol: TCP
+  - name: internal
+    port: 3113
+    targetPort: 3113
+    protocol: TCP
+  selector:
+    app: edge-epoch-master
+
