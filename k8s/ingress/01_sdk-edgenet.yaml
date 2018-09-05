@@ -1,0 +1,32 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sdk-edgenet-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefix
+    ingress.kubernetes.io/custom-response-headers: 'Access-Control-Allow-Origin: *'
+spec:
+  rules:
+  - host: sdk-edgenet.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: external
+      - path: /v2/debug
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: internal
+      - path: /channel
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: channel
+      - path: /websocket
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: websocket
+
+        

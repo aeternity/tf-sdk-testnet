@@ -6,17 +6,26 @@ metadata:
 data:
   epoch-master.yaml: |
     ---
+    sync:
+      port: 3115
+      external_port: 3015
+
     peers: []
 
     http:
       external:
         port: 3013
       internal:
+        port: 3113
         listen_address: 0.0.0.0
-      debug: false
+      debug: true
 
     websocket:
       internal:
+        port: 3114
+        listen_address: 0.0.0.0
+      channel:
+        port: 3014
         listen_address: 0.0.0.0
 
     keys:
@@ -69,8 +78,10 @@ spec:
         image: aeternity/epoch:v0.21.0
         ports:
         - containerPort: 3013
-        - containerPort: 3015
         - containerPort: 3113
+        - containerPort: 3014
+        - containerPort: 3114
+        - containerPort: 3015
         volumeMounts:
         - name: config
           mountPath: /etc/epoch
@@ -106,6 +117,14 @@ spec:
   - name: internal
     port: 3113
     targetPort: 3113
+    protocol: TCP
+  - name: channel
+    port: 3014
+    targetPort: 3014
+    protocol: TCP
+  - name: websocket
+    port: 3114
+    targetPort: 3114
     protocol: TCP
   selector:
     app: edge-epoch-master
