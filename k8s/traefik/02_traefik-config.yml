@@ -8,7 +8,7 @@ data:
   traefik.toml: |-
     debug = false
     defaultEntryPoints = ["http", "https"]
-    logLevel = "ERROR"
+    logLevel = "INFO"
 
     [entryPoints]
     
