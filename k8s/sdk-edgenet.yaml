@@ -36,7 +36,7 @@ data:
       persist: true
 
     mining:
-      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
       autostart: true
       expected_mine_rate: 1200000
       cuckoo:
@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
       - name: edge-epoch-master
-        image: aeternity/epoch:v0.21.0
+        image: aeternity/epoch:v0.22.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
