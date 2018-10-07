@@ -1,0 +1,262 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:  epoch-uber-proxy-config
+data:
+  proxy.conf: |
+    # sdk-testnet
+    proxy_cache_path  /var/cache/nginx/testnet levels=1:2 keys_zone=cache_testnet:20m max_size=200m;
+    server {
+      listen 80;
+      server_name sdk-testnet.aepps.com;
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow_Credentials' 'true';
+      add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+
+      location / {
+
+        if ($request_method = 'OPTIONS') {
+          add_header 'Content-Type' 'text/plain charset=UTF-8';
+          add_header 'Content-Length' 0;
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow_Credentials' 'true';
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+          return 204;
+        }
+
+        set $cache_testnet 'off';
+        if ($http_origin = https://explorer.aepps.com) {
+            set $cache_testnet 'cache_testnet';
+            add_header X-Cached '1';
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow_Credentials' 'true';
+            add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+        }
+
+
+        # Caching directives
+        proxy_cache cache_testnet;
+        proxy_cache_background_update on;
+        proxy_cache_convert_head on;
+        proxy_cache_key "$host$request_uri$request_method";
+        proxy_cache_lock off;
+        proxy_cache_lock_age 5s;
+        proxy_cache_lock_timeout 5s;
+        proxy_cache_methods GET HEAD;
+        proxy_cache_min_uses 1;
+        proxy_cache_use_stale off;
+        proxy_cache_valid 200 302 3m;
+
+
+        proxy_redirect off;
+        proxy_set_header host $host;
+        proxy_set_header X-real-ip $remote_addr;
+        proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+        proxy_pass http://epoch-master:3013;
+      }
+
+
+      location /v2/debug {
+          if ($request_method = 'OPTIONS') {
+            add_header 'Content-Type' 'text/plain charset=UTF-8';
+            add_header 'Content-Length' 0;
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow_Credentials' 'true';
+            add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+            return 204;
+          }
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://epoch-master:3113;
+      }
+      location /channels {
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://epoch-master:3014;
+      }
+      location /websocket {
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://epoch-master:3015;
+      }
+
+    }
+
+    # sdk-edgenet
+
+    proxy_cache_path  /var/cache/nginx/edgenet levels=1:2 keys_zone=cache_edgenet:20m max_size=200m;
+    server {
+      listen 80;
+      server_name sdk-edgenet.aepps.com;
+
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow_Credentials' 'true';
+      add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+
+      location / {
+
+        if ($request_method = 'OPTIONS') {
+          add_header 'Content-Type' 'text/plain charset=UTF-8';
+          add_header 'Content-Length' 0;
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow_Credentials' 'true';
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+          return 204;
+        }
+
+        set $cache_edgenet 'off';
+        if ($http_origin = https://explorer.aepps.com) {
+            set $cache_edgenet 'cache_edgenet';
+            add_header X-Cached "1";
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow_Credentials' 'true';
+            add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+        }
+
+
+        # Caching directives
+        proxy_cache cache_edgenet;
+        proxy_cache_background_update on;
+        proxy_cache_convert_head on;
+        proxy_cache_key "$host$request_uri$request_method";
+        proxy_cache_lock off;
+        proxy_cache_lock_age 5s;
+        proxy_cache_lock_timeout 5s;
+        proxy_cache_methods GET HEAD;
+        proxy_cache_min_uses 1;
+        proxy_cache_use_stale off;
+        proxy_cache_valid 200 302 3m;
+
+
+        proxy_redirect off;
+        proxy_set_header host $host;
+        proxy_set_header X-real-ip $remote_addr;
+        proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+        proxy_pass http://edge-epoch-master:3013;
+      }
+
+
+      location /v2/debug {
+
+          if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain charset=UTF-8';
+            add_header 'Content-Length' 0;
+            return 204;
+          }
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://edge-epoch-master:3113;
+      }
+      location /channels {
+          if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain charset=UTF-8';
+            add_header 'Content-Length' 0;
+            return 204;
+          }
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://edge-epoch-master:3014;
+      }
+      location /websocket {
+          if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain charset=UTF-8';
+            add_header 'Content-Length' 0;
+            return 204;
+          }
+          proxy_redirect off;
+          proxy_set_header host $host;
+          proxy_set_header X-real-ip $remote_addr;
+          proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+          proxy_pass http://edge-epoch-master:3015;
+      }
+
+    }
+
+    server {
+        listen 80;
+        server_name *.sdk-testnet.aepps.com;
+        
+        proxy_redirect off;
+        proxy_set_header host $host;
+        proxy_set_header X-real-ip $remote_addr;
+        proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+        
+        location / {    
+            proxy_pass http://52.10.46.160:3013;
+        }
+        location /v2/debug {
+            proxy_pass http://52.10.46.160:3113;
+        }
+        location /channels {
+            proxy_pass http://52.10.46.160:3014;
+        }
+        location /websocket {
+            proxy_pass http://52.10.46.160:3015;
+        }
+    }
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epoch-uber-proxy
+spec:
+  selector:
+    matchLabels:
+      app: epoch-uber-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: epoch-uber-proxy
+    spec:
+      containers:
+      - name: epoch-uber-proxy
+        image: 'registry.hub.docker.com/library/nginx:mainline-alpine'
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: epoch-uber-proxy-config
+          mountPath: etc/nginx/conf.d/proxy.conf
+          subPath: proxy.conf
+      volumes:
+      - name: epoch-uber-proxy-config
+        configMap:
+          name: epoch-uber-proxy-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epoch-uber-proxy
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: epoch-uber-proxy
+
