@@ -35,12 +35,23 @@ data:
     storage = "/acme/acme.json"
     onHostRule = true
     entryPoint = "https"
+
+    [[acme.domains]]
+    main = "*.sdk-testnet.aepps.com"
     
-    [acme.httpChallenge]
-    entryPoint = "http"
+    # [acme.httpChallenge]
+    # entryPoint = "http"
+
+    # required for wildcard certificates
+    [acme.dnsChallenge]
+    provider = "route53"
+    # also set the 
+    # AWS_ACCESS_KEY_ID
+    # AWS_SECRET_ACCESS_KEY
+    # as environment variables to authenticate the dns challenge
 
     # this is for the dashboard
-    [web]
-    address = ":8080"
-    [web.auth.basic]
-    users = ["traefik:$2y$05$M6GZaiWFv5wassGSjeRdMukNpNWBfmaS9P/8lgEHB6oun3uGdwniq"]
+    # [web]
+    # address = ":8080"
+    # [web.auth.basic]
+    # users = ["traefik:$2y$05$M6GZaiWFv5wassGSjeRdMukNpNWBfmaS9P/8lgEHB6oun3uGdwniq"]

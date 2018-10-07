@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
 
-# deployment
+# deployment  
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -41,11 +41,25 @@ spec:
           containerPort: 80
         - name: https
           containerPort: 443
-        - name: admin
-          containerPort: 8080
         args:
         - --api
         - --configfile=/config/traefik.toml
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: traefik-aws
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: traefik-aws
+                key: AWS_SECRET_ACCESS_KEY
+          - name: AWS_HOSTED_ZONE_ID
+            valueFrom:
+              secretKeyRef:
+                name: traefik-aws
+                key: AWS_HOSTED_ZONE_ID
         volumeMounts:
         - name: traefik-config
           mountPath: /config
