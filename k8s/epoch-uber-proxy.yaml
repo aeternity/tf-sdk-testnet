@@ -107,7 +107,7 @@ data:
       add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
 
       location / {
-
+      
         if ($request_method = 'OPTIONS') {
           add_header 'Content-Type' 'text/plain charset=UTF-8';
           add_header 'Content-Length' 0;
@@ -154,11 +154,20 @@ data:
       location /v2/debug {
 
           if ($request_method = 'OPTIONS') {
-            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow_Credentials' 'true';
+            add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
             add_header 'Content-Type' 'text/plain charset=UTF-8';
             add_header 'Content-Length' 0;
             return 204;
           }
+
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow_Credentials' 'true';
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+
           proxy_redirect off;
           proxy_set_header host $host;
           proxy_set_header X-real-ip $remote_addr;
@@ -167,7 +176,6 @@ data:
       }
       location /channels {
           if ($request_method = 'OPTIONS') {
-            add_header 'Access-Control-Max-Age' 1728000;
             add_header 'Content-Type' 'text/plain charset=UTF-8';
             add_header 'Content-Length' 0;
             return 204;
@@ -180,7 +188,6 @@ data:
       }
       location /websocket {
           if ($request_method = 'OPTIONS') {
-            add_header 'Access-Control-Max-Age' 1728000;
             add_header 'Content-Type' 'text/plain charset=UTF-8';
             add_header 'Content-Length' 0;
             return 204;
@@ -203,7 +210,11 @@ data:
         proxy_set_header X-real-ip $remote_addr;
         proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
         
-        location / {    
+        location / {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow_Credentials' 'true';
+            add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
             proxy_pass http://52.10.46.160:3013;
         }
         location /v2/debug {
