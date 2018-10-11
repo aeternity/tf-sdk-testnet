@@ -1,0 +1,75 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: edge-aepp-faucet-config
+data:
+  EPOCH_URL: https://sdk-edgenet.aepps.com
+  TOPUP_AMOUNT: '250' 
+  TX_TTL: '50'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-aepp-faucet
+spec:
+  selector:
+    matchLabels:
+      app: edge-aepp-faucet
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: edge-aepp-faucet
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: edge-aepp-faucet
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-faucet:088fbbc
+        ports:
+        - name: web
+          containerPort: 5000
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
+          limits:
+            cpu: "600m"
+            memory: "256Mi"
+        env:
+        - name: EPOCH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: edge-aepp-faucet-config
+              key: EPOCH_URL
+        - name: TX_TTL
+          valueFrom:
+            configMapKeyRef:
+              name: edge-aepp-faucet-config
+              key: TX_TTL
+        - name: TOPUP_AMOUNT
+          valueFrom:
+            configMapKeyRef:
+              name: edge-aepp-faucet-config
+              key: TOPUP_AMOUNT
+        - name: FAUCET_ACCOUNT_PRIV_KEY
+          valueFrom:
+            secretKeyRef:
+              name: edge-aepp-faucet-secrets
+              key: FAUCET_ACCOUNT_PRIV_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-aepp-faucet-service
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: edge-aepp-faucet
+
