@@ -26,7 +26,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: aepp-faucet
-        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-faucet:e9365ce
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-faucet:0.24.0.1
         ports:
         - name: web
           containerPort: 5000
@@ -59,6 +59,21 @@ spec:
             secretKeyRef:
               name: aepp-faucet-secrets
               key: FAUCET_ACCOUNT_PRIV_KEY
+        - name: TELEGRAM_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: aepp-faucet-config
+              key: TELEGRAM_ENABLED
+        - name: TELEGRAM_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: aepp-faucet-secrets
+              key: TELEGRAM_API_TOKEN
+        - name: TELEGRAM_CHAT_ID
+          valueFrom:
+            secretKeyRef:
+              name: aepp-faucet-secrets
+              key: TELEGRAM_CHAT_ID
 ---
 apiVersion: v1
 kind: Service
