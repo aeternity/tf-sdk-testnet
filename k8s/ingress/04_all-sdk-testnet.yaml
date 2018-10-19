@@ -15,7 +15,7 @@ metadata:
   name: all-sdk-testnet-ingress
   annotations:
     kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+    traefik.ingress.kubernetes.io/rule-type: PathPrefix
 spec:
   rules:
   - host: sdk-testnet.aepps.com
@@ -23,8 +23,16 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: epoch-uber-proxy
-          servicePort: http
+          serviceName: epoch-master
+          servicePort: external
+      - path: /v2/debug
+        backend:
+          serviceName: epoch-master
+          servicePort: internal
+      - path: /channel
+        backend:
+          serviceName: epoch-master
+          servicePort: channel
 
   - host: "*.sdk-testnet.aepps.com"
     http:

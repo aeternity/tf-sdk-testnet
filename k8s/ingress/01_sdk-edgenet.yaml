@@ -13,19 +13,19 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: epoch-uber-proxy
-          servicePort: http
-      # - path: /v2/debug
-      #   backend:
-      #     serviceName: edge-epoch-master
-      #     servicePort: internal
-      # - path: /channel
-      #   backend:
-      #     serviceName: edge-epoch-master
-      #     servicePort: channel
-      # - path: /websocket
-      #   backend:
-      #     serviceName: edge-epoch-master
-      #     servicePort: websocket
+          serviceName: edge-epoch-master
+          servicePort: external
+      - path: /v2/debug
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: internal
+      - path: /channel
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: channel
+      - path: /websocket
+        backend:
+          serviceName: edge-epoch-master
+          servicePort: websocket
 
         

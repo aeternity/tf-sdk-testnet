@@ -102,11 +102,18 @@ spec:
         fsGroup: 1000
       containers:
       - name: epoch-master
-        image: aeternity/epoch:v0.22.0
+        image: aeternity/epoch:v0.24.0
         ports:
         - containerPort: 3013
         - containerPort: 3015
         - containerPort: 3113
+        - containerPort: 3014
+        livenessProbe:
+          httpGet:
+            path: /v2/status
+            port: 3013
+          initialDelaySeconds: 30
+          periodSeconds: 300
         volumeMounts:
         - name: config
           mountPath: /etc/epoch
@@ -124,24 +131,6 @@ spec:
         secret:
           secretName: epoch-keys
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: epoch-service
-spec:
-  type: LoadBalancer
-  ports:
-  - name: external
-    port: 3013
-    targetPort: 3013
-    protocol: TCP
-  - name: internal
-    port: 3113
-    targetPort: 3113
-    protocol: TCP
-  selector:
-    app: epoch-master
 
 ---
 apiVersion: v1
@@ -161,6 +150,10 @@ spec:
   - name: internal
     port: 3113
     targetPort: 3113
+    protocol: TCP
+  - name: channel
+    port: 3014
+    targetPort: 3014
     protocol: TCP
   selector:
     app: epoch-master
@@ -182,7 +175,7 @@ spec:
     spec:
       containers:
       - name: node
-        image: aeternity/epoch:v0.22.0
+        image: aeternity/epoch:v0.24.0
         ports:
         - containerPort: 3015
         volumeMounts:
