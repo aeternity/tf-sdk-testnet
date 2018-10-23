@@ -1,4 +1,14 @@
-
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: epoch-logs-pvc
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
 
 ---
 apiVersion: v1
@@ -120,6 +130,8 @@ spec:
         - name: keys
           mountPath: /home/epoch/node/keys
           readOnly: true
+        - name: logs
+          mountPath: /home/epoch/node/log
         env:
         - name: EPOCH_CONFIG
           value: /etc/epoch/epoch-master.yaml
@@ -130,6 +142,9 @@ spec:
       - name: keys
         secret:
           secretName: epoch-keys
+      - name: logs
+        persistentVolumeClaim:
+          claimName: epoch-logs-pvc
 
 
 ---
