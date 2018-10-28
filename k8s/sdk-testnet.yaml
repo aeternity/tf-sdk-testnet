@@ -1,5 +1,17 @@
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: epoch-logs-pvc
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: epoch-config
@@ -27,9 +39,9 @@ data:
       persist: true
 
     mining:
-      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
       autostart: true
-      expected_mine_rate: 15000
+      expected_mine_rate: 180000
       cuckoo:
         miner:
           executable: mean16s-generic
@@ -38,7 +50,7 @@ data:
   epoch-miner.yaml: |
     ---
     peers:
-    - aenode://pp$HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@epoch-master:3015
+    - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@epoch-master:3015
 
     http:
       external:
@@ -58,9 +70,9 @@ data:
       persist: true
 
     mining:
-      beneficiary: "ak$25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
       autostart: true
-      expected_mine_rate: 15000
+      expected_mine_rate: 180000
       cuckoo:
         miner:
           executable: mean16s-generic
@@ -100,17 +112,26 @@ spec:
         fsGroup: 1000
       containers:
       - name: epoch-master
-        image: aeternity/epoch:v0.18.0
+        image: aeternity/epoch:v0.24.0
         ports:
         - containerPort: 3013
         - containerPort: 3015
         - containerPort: 3113
+        - containerPort: 3014
+        livenessProbe:
+          httpGet:
+            path: /v2/status
+            port: 3013
+          initialDelaySeconds: 30
+          periodSeconds: 300
         volumeMounts:
         - name: config
           mountPath: /etc/epoch
         - name: keys
           mountPath: /home/epoch/node/keys
           readOnly: true
+        - name: logs
+          mountPath: /home/epoch/node/log
         env:
         - name: EPOCH_CONFIG
           value: /etc/epoch/epoch-master.yaml
@@ -121,25 +142,10 @@ spec:
       - name: keys
         secret:
           secretName: epoch-keys
+      - name: logs
+        persistentVolumeClaim:
+          claimName: epoch-logs-pvc
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: epoch-service
-spec:
-  type: LoadBalancer
-  ports:
-  - name: external
-    port: 3013
-    targetPort: 3013
-    protocol: TCP
-  - name: internal
-    port: 3113
-    targetPort: 3113
-    protocol: TCP
-  selector:
-    app: epoch-master
 
 ---
 apiVersion: v1
@@ -159,6 +165,10 @@ spec:
   - name: internal
     port: 3113
     targetPort: 3113
+    protocol: TCP
+  - name: channel
+    port: 3014
+    targetPort: 3014
     protocol: TCP
   selector:
     app: epoch-master
@@ -180,7 +190,7 @@ spec:
     spec:
       containers:
       - name: node
-        image: aeternity/epoch:v0.18.0
+        image: aeternity/epoch:v0.24.0
         ports:
         - containerPort: 3015
         volumeMounts:

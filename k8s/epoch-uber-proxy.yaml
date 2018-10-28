@@ -11,12 +11,24 @@ data:
       listen 80;
       server_name sdk-testnet.aepps.com;
 
-      add_header 'Access-Control-Allow-Origin' '*';
-      add_header 'Access-Control-Allow_Credentials' 'true';
-      add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
-      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
-
       location / {
+        
+        if ($request_method = 'POST') {
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow_Credentials' 'true';
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+        }
+
+
+        if ($request_method = 'GET') {
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow_Credentials' 'true';
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type';
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD';
+        }
+        
+
 
         if ($request_method = 'OPTIONS') {
           add_header 'Content-Type' 'text/plain charset=UTF-8';

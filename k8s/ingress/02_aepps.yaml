@@ -28,3 +28,10 @@ spec:
         backend:
           serviceName: aepp-contracts-service
           servicePort: 80
+  - host: edge-explorer.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: aepp-explorer-service
+          servicePort: 80

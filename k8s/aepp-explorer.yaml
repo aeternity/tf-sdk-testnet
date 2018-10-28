@@ -1,30 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aepp-contracts
+  name: aepp-explorer
 spec:
   selector:
     matchLabels:
-      app: aepp-contracts
+      app: aepp-explorer
   replicas: 1
   template:
     metadata:
       labels:
-        app: aepp-contracts
+        app: aepp-explorer
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-      - name: aepp-contracts
-        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-contracts:0.24.0-1.0.0
+      - name: aepp-explorer
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aepp-explorer:bfbc816
         ports:
         - name: web
           containerPort: 80
         imagePullPolicy: Always
+        env:
+          - name: VUE_APP_EPOCH_URL
+            value: https://sdk-testnet.aepps.com
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: aepp-contracts-service
+  name: aepp-explorer-service
 spec:
   ports:
   - name: web
@@ -32,19 +35,19 @@ spec:
     targetPort: 80
     protocol: TCP
   selector:
-    app: aepp-contracts
+    app: aepp-explorer
     
 
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: aepp-contracts
+  name: aepp-explorer
   labels:
     team: frontend
 spec:
   selector:
     matchLabels:
-      app: aepp-contracts
+      app: aepp-explorer
   endpoints:
   - port: web

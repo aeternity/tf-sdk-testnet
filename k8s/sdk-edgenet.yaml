@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
       - name: edge-epoch-master
-        image: aeternity/epoch:v0.22.0
+        image: aeternity/epoch:v0.24.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
@@ -91,6 +91,12 @@ spec:
         env:
         - name: EPOCH_CONFIG
           value: /etc/epoch/epoch-master.yaml
+        livenessProbe:
+          httpGet:
+            path: /v2/status
+            port: 3013
+          initialDelaySeconds: 30
+          periodSeconds: 300
       volumes:
       - name: config
         configMap:
