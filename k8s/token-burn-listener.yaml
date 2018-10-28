@@ -1,0 +1,44 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-burn-listener
+spec:
+  selector:
+    matchLabels:
+      app: token-burn-listener
+  replicas: 10
+  template:
+    metadata:
+      labels:
+        app: token-burn-listener
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: token-burn-listener
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/token-burn-listener:de00db5
+        imagePullPolicy: Always
+        env:
+        - name: NODE_BL_ID
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_BL_ID
+        - name: NODE_BL_KEY
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_BL_KEY
+        - name: NODE_BURNER_CONTRACT
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_BURNER_CONTRACT
+        - name: NODE_WEB3_URL
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_WEB3_URL
+        
+
