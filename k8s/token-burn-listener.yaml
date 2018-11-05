@@ -30,6 +30,16 @@ spec:
             secretKeyRef:
               name: token-burn-listener-secrets
               key: NODE_BL_KEY
+        - name: NODE_BL_LOGIN
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_BL_LOGIN
+        - name: NODE_BL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: token-burn-listener-secrets
+              key: NODE_BL_PASSWORD
         - name: NODE_BURNER_CONTRACT
           valueFrom:
             secretKeyRef:
