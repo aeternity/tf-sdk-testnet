@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aepp-sentinel
+spec:
+  selector:
+    matchLabels:
+      app: aepp-sentinel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aepp-sentinel
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: aepp-sentinel
+        image: 166568770115.dkr.ecr.eu-central-1.amazonaws.com/aeternity/aepp-sentinel:c37b573
+        ports:
+        - name: web
+          containerPort: 5000
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
+          limits:
+            cpu: "600m"
+            memory: "256Mi"
+        env:
+        - name: SENTINEL_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: aepp-sentinel-secrets
+              key: SENTINEL_AUTH_TOKEN
+        - name: TELEGRAM_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: aepp-sentinel-secrets
+              key: TELEGRAM_API_TOKEN
+        - name: TELEGRAM_CHAT_ID
+          valueFrom:
+            secretKeyRef:
+              name: aepp-sentinel-secrets
+              key: TELEGRAM_CHAT_ID
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aepp-sentinel-service
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: aepp-sentinel
