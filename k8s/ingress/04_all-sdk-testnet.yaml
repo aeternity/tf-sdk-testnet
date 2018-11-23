@@ -34,12 +34,13 @@ spec:
           serviceName: epoch-master
           servicePort: channel
 
-  - host: "*.sdk-testnet.aepps.com"
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: epoch-uber-proxy
-          servicePort: http
+
+  # - host: "*.sdk-testnet.aepps.com"
+  #   http:
+  #     paths:
+  #     - path: /
+  #       backend:
+  #         serviceName: epoch-uber-proxy
+  #         servicePort: http
 
         
