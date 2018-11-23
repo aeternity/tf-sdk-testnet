@@ -34,4 +34,10 @@ spec:
       - path: /
         backend:
           serviceName: aepp-explorer-service
+          servicePort: 80  - host: explorer.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: aepp-explorer-service
           servicePort: 80
