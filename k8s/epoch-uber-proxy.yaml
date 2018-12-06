@@ -7,6 +7,132 @@ data:
   proxy.conf: |
     # sdk-testnet
     proxy_cache_path  /var/cache/nginx/testnet levels=1:2 keys_zone=cache_testnet:20m max_size=200m;
+    
+   
+    server {
+      listen 80;
+      server_name roma-net.aepps.com;
+      location / {
+        proxy_hide_header 'access-control-allow-origin';
+        proxy_hide_header 'access-control-allow_credentials';
+        proxy_hide_header 'access-control-allow-headers';
+        proxy_hide_header 'access-control-allow-methods';
+
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow_Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+        add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+
+        if ($request_method = 'POST') {
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+        }
+
+
+        if ($request_method = 'GET') {
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+        }
+        
+
+
+        if ($request_method = 'OPTIONS') {
+          add_header 'Content-Type' 'text/plain charset=UTF-8' always;
+          add_header 'Content-Length' 0 always;
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+          return 204;
+        }
+
+        # Caching directives
+        # proxy_cache cache_testnet;
+        proxy_cache_background_update on;
+        proxy_cache_convert_head on;
+        proxy_cache_key "$host$request_uri$request_method";
+        proxy_cache_lock off;
+        proxy_cache_lock_age 5s;
+        proxy_cache_lock_timeout 5s;
+        proxy_cache_methods GET HEAD;
+        proxy_cache_min_uses 1;
+        proxy_cache_use_stale off;
+        proxy_cache_valid 200 302 3m;
+
+        proxy_redirect off;
+        proxy_set_header host $host;
+        proxy_set_header X-real-ip $remote_addr;
+        proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+        proxy_pass http://roma-epoch-master:3013;
+      }
+    }
+
+    server {
+      listen 80;
+      server_name sdk-mainnet.aepps.com;
+      location / {
+      
+        proxy_hide_header 'access-control-allow-origin';
+        proxy_hide_header 'access-control-allow_credentials';
+        proxy_hide_header 'access-control-allow-headers';
+        proxy_hide_header 'access-control-allow-methods';
+
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow_Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+        add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+
+        if ($request_method = 'POST') {
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+        }
+
+        if ($request_method = 'GET') {
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+        }
+        
+
+
+        if ($request_method = 'OPTIONS') {
+          add_header 'Content-Type' 'text/plain charset=UTF-8' always;
+          add_header 'Content-Length' 0 always;
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow_Credentials' 'true' always;
+          add_header 'Access-Control-Allow-Headers' 'Accept,Keep-Alive,User-Agent,Content-Type' always;
+          add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,HEAD' always;
+          return 204;
+        }
+
+         # Caching directives
+        # proxy_cache cache_testnet;
+        proxy_cache_background_update on;
+        proxy_cache_convert_head on;
+        proxy_cache_key "$host$request_uri$request_method";
+        proxy_cache_lock off;
+        proxy_cache_lock_age 5s;
+        proxy_cache_lock_timeout 5s;
+        proxy_cache_methods GET HEAD;
+        proxy_cache_min_uses 1;
+        proxy_cache_use_stale off;
+        proxy_cache_valid 200 302 3m;
+
+        proxy_redirect off;
+        proxy_set_header host $host;
+        proxy_set_header X-real-ip $remote_addr;
+        proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+        proxy_pass http://main-epoch-master:3013;
+      }
+    }
+
     server {
       listen 80;
       server_name sdk-testnet.aepps.com;

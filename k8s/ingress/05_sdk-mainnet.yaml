@@ -1,0 +1,33 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sdk-mainnet-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefix
+spec:
+  rules:
+  - host: sdk-mainnet.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: main-epoch-master
+          servicePort: external
+      - path: /v2/debug
+        backend:
+          serviceName: main-epoch-master
+          servicePort: internal
+      # - path: /channel
+      #   backend:
+      #     serviceName: main-epoch-master
+      #     servicePort: channel
+      # - path: /websocket
+      #   backend:
+      #     serviceName: main-epoch-master
+      #     servicePort: websocket
+
+      
+
+        
