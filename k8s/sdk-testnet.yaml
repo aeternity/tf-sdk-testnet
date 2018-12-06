@@ -20,26 +20,32 @@ data:
     ---
     peers: []
 
+
+    sync:
+      port: 301
+      external_port: 3115
+
     http:
       external:
         port: 3013
       internal:
         listen_address: 0.0.0.0
       debug: true
-
+    
     websocket:
-      internal:
+      channel:
+        port: 3014
         listen_address: 0.0.0.0
 
     keys:
-      password: "top secret"
+      peer_password: "top secret"
       dir: ./keys
 
     chain:
       persist: true
 
     mining:
-      beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
       autostart: true
       expected_mine_rate: 180000
       cuckoo:
@@ -52,25 +58,23 @@ data:
     peers:
     - aenode://pp_HdcpgTX2C1aZ5sjGGysFEuup67K9XiFsWqSPJs4RahEcSyF7X@epoch-master:3015
 
+
     http:
       external:
         port: 3013
       internal:
         listen_address: 0.0.0.0
 
-    websocket:
-      internal:
-        listen_address: 0.0.0.0
 
     keys:
-      password: "top secret"
+      peer_password: "top secret"
       dir: ./keys
 
     chain:
       persist: true
 
     mining:
-      beneficiary: "ak_25MZX3BXYP32YDPGWsJqYZ6CgWnqD93VdpCYaTk6KsThEbeFJX"
+      beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
       autostart: true
       expected_mine_rate: 180000
       cuckoo:
@@ -112,7 +116,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: epoch-master
-        image: aeternity/epoch:v0.24.0
+        image: aeternity/epoch:v0.25.0
         ports:
         - containerPort: 3013
         - containerPort: 3015
@@ -190,7 +194,7 @@ spec:
     spec:
       containers:
       - name: node
-        image: aeternity/epoch:v0.24.0
+        image: aeternity/epoch:v0.25.0
         ports:
         - containerPort: 3015
         volumeMounts:
