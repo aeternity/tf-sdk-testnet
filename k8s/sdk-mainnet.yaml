@@ -1,8 +1,19 @@
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ae-node-pvc
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: main-epoch-config
+  name: ae-node-config
 data:
   epoch-master.yaml: |
     ---
@@ -32,47 +43,60 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: main-epoch-master
+  name: ae-node
 spec:
   selector:
     matchLabels:
-      app: main-epoch-master
+      app: ae-node
   replicas: 1
   template:
     metadata:
       labels:
-        app: main-epoch-master
+        app: ae-node
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
-      - name: main-epoch-master
-        image: aeternity/epoch:v1.0.1
+      - name: ae-node
+        image: aeternity/epoch:v1.2.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
         - containerPort: 3014
         - containerPort: 3015
-        volumeMounts:
-        - name: config
-          mountPath: /etc/epoch
-        env:
-        - name: EPOCH_CONFIG
-          value: /etc/epoch/epoch-master.yaml
         livenessProbe:
           httpGet:
             path: /v2/status
             port: 3013
           initialDelaySeconds: 30
           periodSeconds: 300
+        volumeMounts:
+        - name: config
+          mountPath: /etc/epoch
+        - name: data
+          subPath: logs
+          mountPath: /home/epoch/node/log
+        - name: data
+          subPath: mnesia
+          mountPath: /home/epoch/node/data/mnesia
+        env:
+        - name: EPOCH_CONFIG
+          value: /etc/epoch/epoch-master.yaml
       volumes:
       - name: config
         configMap:
-          name: main-epoch-config
+          name: ae-node-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: ae-node-pvc
+      
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: main-epoch-master
+  name: ae-node-service
 spec:
   ports:
   - name: external
@@ -83,5 +107,9 @@ spec:
     port: 3113
     targetPort: 3113
     protocol: TCP
+  - name: channel
+    port: 3014
+    targetPort: 3014
+    protocol: TCP
   selector:
-    app: main-epoch-master
+    app: ae-node

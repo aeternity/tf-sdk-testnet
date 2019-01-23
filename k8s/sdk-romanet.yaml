@@ -1,5 +1,18 @@
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: roma-epoch-data-vpc
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: roma-epoch-config
@@ -9,6 +22,7 @@ data:
     http:
       external:
         port: 3013
+        acceptors: 300
       internal:
         port: 3113
         listen_address: 0.0.0.0
@@ -27,6 +41,14 @@ data:
     mining:
       beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688"
       autostart: false
+    regulators:
+      http_read:
+        # this is for the job queue
+        max_size: 200
+        counter: 50
+        max_time: 0
+        rate: 0
+
 
 ---
 apiVersion: apps/v1
@@ -43,9 +65,12 @@ spec:
       labels:
         app: roma-epoch-master
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
       - name: roma-epoch-master
-        image: aeternity/epoch:v1.0.1
+        image: aeternity/epoch:v1.1.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
@@ -54,6 +79,12 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /etc/epoch
+        - name: data
+          subPath: mnesia
+          mountPath: /home/epoch/node/data/mnesia
+        - name: data
+          subPath: log
+          mountPath: /home/epoch/node/log
         env:
         - name: EPOCH_CONFIG
           value: /etc/epoch/epoch-master.yaml
@@ -67,6 +98,9 @@ spec:
       - name: config
         configMap:
           name: roma-epoch-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: roma-epoch-data-vpc
 
 ---
 apiVersion: v1
