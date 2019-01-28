@@ -15,7 +15,7 @@ kind: ConfigMap
 metadata:
   name: ae-node-config
 data:
-  epoch-master.yaml: |
+  aeternity.yaml: |
     ---
     http:
       external:
@@ -23,9 +23,7 @@ data:
       internal:
         port: 3113
         listen_address: 0.0.0.0
-      endpoints:
-        debug: true
-      debug: true
+        debug_endpoints: true
 
     websocket:
       channel:
@@ -59,7 +57,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: ae-node
-        image: aeternity/epoch:v1.2.0
+        image: aeternity/aeternity:v1.3.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
@@ -73,16 +71,16 @@ spec:
           periodSeconds: 300
         volumeMounts:
         - name: config
-          mountPath: /etc/epoch
+          mountPath: /etc/aeternity
         - name: data
           subPath: logs
-          mountPath: /home/epoch/node/log
+          mountPath: /home/aeternity/node/log
         - name: data
           subPath: mnesia
-          mountPath: /home/epoch/node/data/mnesia
+          mountPath: /home/aeternity/node/data/mnesia
         env:
         - name: EPOCH_CONFIG
-          value: /etc/epoch/epoch-master.yaml
+          value: /etc/aeternity/aeternity.yaml
       volumes:
       - name: config
         configMap:
