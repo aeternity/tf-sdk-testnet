@@ -1,0 +1,36 @@
+---
+
+
+# Access-Control-Allow-Origin "*"
+# Access-Control-Allow-Headers "Authorization, Content-Type"
+# Access-Control-Allow-Methods "GET, OPTIONS, POST"
+# Access-Control-Expose-Headers "Content-Security-Policy, Location"
+# Access-Control-Max-Age "600"
+
+
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: all-sdk-testnet-ingress
+  namespace: testnet
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefix
+spec:
+  rules:
+  - host: sdk-testnet.aepps.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ae-node-service
+          servicePort: external
+      - path: /v2/debug
+        backend:
+          serviceName: ae-node-service
+          servicePort: internal
+      - path: /channel
+        backend:
+          serviceName: ae-node-service
+          servicePort: channel
