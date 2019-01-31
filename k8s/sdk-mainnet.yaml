@@ -57,7 +57,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: ae-node
-        image: aeternity/aeternity:v1.3.0
+        image: aeternity/aeternity:v1.4.0
         ports:
         - containerPort: 3013
         - containerPort: 3113
